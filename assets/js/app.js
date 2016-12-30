@@ -9,6 +9,7 @@ var config = {
 firebase.initializeApp(config);
 
 var database = firebase.database();
+var currentTime = moment();
 
 database.ref().on("child_added", function(childSnap) {
 
@@ -20,6 +21,11 @@ database.ref().on("child_added", function(childSnap) {
     var next = childSnap.val().next;
 
     $("#trainTable > tbody").append("<tr><td>" + name + "</td><td>" + destination + "</td><td>" + frequency + "</td><td>" + next + "</td><td>" + min + "</td></tr>");
+});
+
+database.ref().on("value", function(snapshot) {
+   
+
 });
 
 //grabs information from the form
@@ -47,21 +53,15 @@ $("#addTrainBtn").on("click", function() {
         alert('Enter a frequency');
         return false;
     }
+
     // THE MATH!
     //subtracts the first train time back a year to ensure it's before current time.
     var firstTrainConverted = moment(firstTrain, "hh:mm").subtract("1, years");
-    console.log(firstTrainConverted);
-    var currentTime = moment();
-    console.log('Current Time: ' + moment(currentTime).format("hh:mm"));
     // the time difference between current time and the first train
     var difference = currentTime.diff(moment(firstTrainConverted), "minutes");
-    console.log('Difference ' + difference);
     var remainder = difference % frequency;
-    console.log(remainder);
     var minUntilTrain = frequency - remainder;
-    console.log('min until train: ' + minUntilTrain);
     var nextTrain = moment().add(minUntilTrain, "minutes").format("hh:mm a");
-    console.log('Next Train: ' + nextTrain);
 
     var newTrain = {
         name: trainName,
